@@ -8,6 +8,7 @@ static uint8_t vspace;
 static uint8_t fntglyphw;
 static bool bmpfont;
 static bool bmpcolor;
+static uint8_t bmpcolormask;
 
 void ESPVGAX2::setFont(ESPVGAX2_PROGMEM uint8_t *fnt_, uint8_t glyphscount_, 
   uint8_t fntheight_, uint8_t fntglyphw_, uint8_t hspace_, uint8_t vspace_) {
@@ -30,8 +31,11 @@ void ESPVGAX2::setBitmapFont(ESPVGAX2_PROGMEM uint8_t *bmp, uint8_t h, int gw) {
   fntglyphw=gw;
   bmpcolor=false;
 }
-void ESPVGAX2::setBitmapFontColor(ESPVGAX2_PROGMEM uint8_t *bmp, uint8_t h, int gw) {
+void ESPVGAX2::setBitmapFontColor(ESPVGAX2_PROGMEM uint8_t *bmp, uint8_t h, 
+  uint8_t mask, int gw) {
+
   setBitmapFont(bmp, h, gw);
+  bmpcolormask=mask;
   bmpcolor=true;
 }
 #define PRINT_LOOP_CODE(reader) \
@@ -43,7 +47,7 @@ void ESPVGAX2::setBitmapFontColor(ESPVGAX2_PROGMEM uint8_t *bmp, uint8_t h, int 
     dy0+=fntheight+vspace; \
   } else if (c=='\e') { \
     color=reader(pstr++); \
-    if (color==0xff && 0) \
+    if (color==0xff) \
       color=default_color; \
   } else { \
     if (bmpfont) { \
@@ -56,12 +60,13 @@ void ESPVGAX2::setBitmapFontColor(ESPVGAX2_PROGMEM uint8_t *bmp, uint8_t h, int 
       int by=fntheight*(uc/16); \
       if (!calc) { \
         if (bmpcolor) { \
-          blit_P(fnt+(by*16+bx)*fntglyphw, \
-                 dx, dy0, \
-                 8*fntglyphw, \
-                 fntheight, \
-                 op, \
-                 128*fntglyphw); \
+          blitwmask_P(fnt+(by*16+bx)*fntglyphw, \
+                      dx, dy0, \
+                      8*fntglyphw, \
+                      fntheight, \
+                      bmpcolormask, \
+                      op, \
+                      128*fntglyphw); \
         } else { \
           bitblit_P(fnt+(by*16+bx)*fntglyphw, \
                     dx, dy0, \

@@ -22,7 +22,7 @@
   }
 
 /*
- * ...
+ * blit unaligned using 32bit read or 8bit read. slow version 
  */
 #define BLITUNALIGNED(checkmask, exec, reader32, reader8) \
   const int srcw8=srcwstride/2; \
@@ -42,6 +42,7 @@
             } \
           } else { \
             uint32_t p = reader32(src + y*srcw8 + (x/2)); \
+            /* unrolled loop for 8 pixels packed in 32bit */ \
             checkmask { exec(dx+x, dy+y, p); } \
             x++; \
             if (x<srcw && (dx+x)<ESPVGAX2_WIDTH) { \
@@ -85,7 +86,7 @@
       } \
     } \
   } 
-#if 0
+#if 0 //NOT WORKING MACRO FROM ESPVGAX lib
 /*
  * write 32bits at a time reading from unaligned src. src width can be aligned
  * to 32,16 or 8 pixels.
@@ -211,19 +212,8 @@
   }
 #endif
 
-#if 0
-    /* blit is unaligned, use 32bit framebuffer with a bunch of shifts */ \
-    if (op==ESPVGAX2_OP_OR) { \
-      BLITUNALIGNED(checkmask, orpixel, reader32, reader8); \
-    } else if (op==ESPVGAX2_OP_XOR) { \
-      BLITUNALIGNED(checkmask, xorpixel, reader32, reader8); \
-    } else { /*OP_SET*/ \
-      BLITUNALIGNED(checkmask, setpixel, reader32, reader8); \
-    } \
-  } 
-#endif
 /*
- * ...
+ * bitblit implementation as macro. reader8 can be pgm_read_byte or simple (*)
  */
 #define BITBLITMETHOD_loop(exec, reader8) \
   const int srcw8=srcwstride/8; \
@@ -241,6 +231,7 @@
             x++; \
           } else { \
             uint8_t p = reader8(src + y*srcw8 + (x/8)); \
+            /* unrolled loop for 8 bits */ \
             if (p & (1<<7)) \
               exec(dx+x, dy+y, color); \
             x++; \

@@ -83,8 +83,6 @@ In the schema you can se that "h" and "v" pins, used for VGA horizzontal and ver
 
 *NOTE: the code the push out pixels does not assume that bit 12 is red, bit 13 is green, bit 14 is blue and bit 15 is high-green. You can change the wiring of resistors and the final purspose of each bit but keep in mind that these 4 packed bits cannot be easily changed. For example you can swap the order of wiring to HBRG without any change to the source code*
 
-
-
 ## 32bit and 8bit Framebuffer
 
 The internal framebuffer is stored as a 32bit framebuffer, where each 32bit word hold 8 packed pixels. You can write to the framebuffer 32 pixels at a time (putpixel32 method), in this case the write operation will be faster than writing single pixels.
@@ -200,7 +198,7 @@ ESPVGAX2 class is static, so you can use the class without create an instance of
       ESPVGAX2::begin();
     }”
 
-Or, if you prefer, you can create your instance, but keep in mind that cannot be
+Or, if you prefer, you can create your instance, but keep in mind that, for now, cannot be
 more than one ESPVGAX2 instance at a time:
 
     ESPVGAX2 vga;
@@ -211,9 +209,7 @@ more than one ESPVGAX2 instance at a time:
 
 ## Examples
 
-This is a simple example of putpixel8 function. The putpixel8 function put 8
-pixels at a time. The following code create a pattern of colors in the setup
-function:
+This is a simple example of putpixel function. The following code create a pattern of colors in the setup function:
 
 	#include <ESPVGAX2.h>
 
@@ -317,7 +313,7 @@ With 1bitfont you can create your fonts from a single image and convert them to 
 ## FAQ
 
 - How to center the video signal horizontally? If you want, you can modify the code of the library, where the HSYNC signal is generated. Seach NOP_DELAY inside ESPVGAX2.cpp. Wrong values can destroy the VGA signal
-- How can i prevent screen flickering? At this time there is no one mechanism to prevent the flickering. From my tests, when flicker appear, there is a delay in the interrupt call or in the pixeldata output timing. Some flickers will appear if you try to read more than 32K from FLASH (for example in the /examples/Image example you can se a little flicker), the cause can be a cache miss inside the memory mapping of ESP8266??
+- How can i prevent screen glitch? At this time there is no one mechanism to prevent the glitch. From my tests, when glitch appear, there is a delay in the interrupt call or in the pixeldata output timing ("memw" instruction?). Some glithes will appear if you try to read more than 32K from FLASH (for example in the /examples/Image example you can see a little glitch), the cause can be a cache miss (or page miss) inside the memory mapping of ESP8266?
 - How can i change PINS? In theory is possible to change HSYNC and VSYNC PINS by changing the library header ESPVGAX2.h. D5 D6 D7 and D8 PINS can be changed but you need to modify also the PUT8PIXELS macro to shift out your 4bit data to the right output 4 digital pin 
 - Why ESPVGAX2 has all its internal symbols defined with a "2" suffix (for example ./fonts2/ and fnt2_arial_* fontmap)? This is because in theory, in future versions, the memory allocation of the framebuffer can be modified to be dynamic (instead of static). This change can, in the future, allow the user sketch to use ESPVGAX (version1) and ESPVGAX2 one at a time, calling begin/end() methods of one library and after that toggling to another library with another begin/end() call.
 

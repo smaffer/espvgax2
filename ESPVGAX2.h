@@ -33,10 +33,10 @@ hardware wiring and library usage.
 #define ESPVGAX2_HSYNC_PIN D2 
 #define ESPVGAX2_VSYNC_PIN D1
 
-#define ESPVGAX2_COLOR0_PIN D5 //cannot be changed
-#define ESPVGAX2_COLOR1_PIN D6 //cannot be changed
-#define ESPVGAX2_COLOR2_PIN D7 //cannot be changed
-#define ESPVGAX2_COLOR3_PIN D8 //cannot be changed
+#define ESPVGAX2_COLOR0_PIN D5 //cannot be changed without change code
+#define ESPVGAX2_COLOR1_PIN D6 //cannot be changed without change code
+#define ESPVGAX2_COLOR2_PIN D7 //cannot be changed without change code
+#define ESPVGAX2_COLOR3_PIN D8 //cannot be changed without change code
 
 #define ESPVGAX2_TIMER 1 //cannot be changed
 
@@ -251,6 +251,12 @@ public:
   static void blit(uint8_t *src, int dx, int dy, int srcw, int srch, 
     int op=ESPVGAX2_OP_SET, int srcwstride=0);
   /*
+   * blitwmask_P(src, dx, dy, srcw, srch, mask, op, srcwstride)
+   * blitwmask  (src, dx, dy, srcw, srch, mask, op, srcwstride)
+   *    draw an image at a given coordinate using a mask color. All pixels that
+   *    match mask color will be NOT drawed.
+   *
+   *    parameters are the same as blit_P and blit methods
    */
   static void blitwmask_P(ESPVGAX2_PROGMEM uint8_t *src, int dx, int dy, 
     int srcw, int srch, uint8_t mask, int op=ESPVGAX2_OP_SET, int srcwstride=0);
@@ -258,19 +264,31 @@ public:
   static void blitwmask(uint8_t *src, int dx, int dy, int srcw, int srch, 
     uint8_t mask, int op=ESPVGAX2_OP_SET, int srcwstride=0);
   /*
-   * note>>>>>>>>> srcwstride and srcw are in BIT coordinate <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   * bitblit_P(src, dx, dy, srcw, srch, color, op, srcwstride)
+   * bitblit  (src, dx, dy, srcw, srch, color, op, srcwstride) 
+   *    draw a 1bit image with the given color at given coordinate.
+   *
+   *    parameter src point to the 1bit image to be drawed. bitlit_P method 
+   *      require that src data is stored inside FLASH ROM. Bits with 1 will be
+   *      drawed with color value. bits with value 0 will not be drawed
+   *    parameters dx and dy specify the top left coordinate where the src image 
+   *      will be drawed
+   *    parameters srcw and srch specify the width and height, in pixels, of the
+   *      src image
+   *    parameter op set the bitwise operator used to draw the src image. One of
+   *      the ESPVGAX2_OP_* constants must be used
+   *    parameter srcwstride is the width, in pixels, of the src image. This
+   *      parameter can seem to be the same thing of parameter srcw but can be
+   *      a different value. For example, if src image is a subimage of a 
+   *      bigger image, srcw will be the width of the subimage, but srcwstride
+   *      MUST be the width of the bigger image. This value will be used to 
+   *      jump from a line of pixels, inside src, to the next line of pixels
    */
   static void bitblit_P(ESPVGAX2_PROGMEM uint8_t *src, int dx, int dy, 
     int srcw, int srch, uint8_t color, int op=ESPVGAX2_OP_SET, int srcwstride=0);
 
   static void bitblit(uint8_t *src, int dx, int dy, int srcw, int srch, 
     uint8_t color, int op=ESPVGAX2_OP_SET, int srcwstride=0);
-  /*
-   * <<<<<<<<<<<<<<<<
-   * /
-  static void rotatezoom_P(ESPVGAX2_PROGMEM uint8_t *img, int sx, int sy, 
-    int sw, int swstride, int sh, int dx, int dy, int dw, int dh, int cx=0, int cy=0, 
-    float angle=0, bool xflip=false, bool yflip=false, uint8_t mask=0xff);*/
   /*
    * setFont(fnt, glyphscount, fntheight, glyphbwidth, hspace, vspace)
    *    set current font for print methods. this method will set a dynamic 
@@ -315,12 +333,13 @@ public:
    *    parameter glyphbwidth set the width, in bytes, of one of the 256 glyphs
    *
    *    NOTE: setBitmapFontColor can be used to use bitmap fonts with 16 colors
-   *      and bitmap width MUST be at least 1 32bit word wide 
+   *      and bitmap width MUST be at least 1 32bit word wide. "mask" parameter
+   *      is used to mask pixels for transparency
    */
   static void setBitmapFont(ESPVGAX2_PROGMEM uint8_t *bitmap, uint8_t fntheight,
     int glyphbwidth=1); 
   static void setBitmapFontColor(ESPVGAX2_PROGMEM uint8_t *bitmap, 
-    uint8_t fntheight, int glyphwwidth=1); 
+    uint8_t fntheight, uint8_t mask, int glyphwwidth=1); 
   /*
    * print_P(str, dx, dy, wrap, len, op, bold)
    * print  (str, dx, dy, wrap, len, op, bold) 
