@@ -36,7 +36,7 @@ Check out my others Arduino libraries:
 
 - [VGAX](https://github.com/smaffer/vgax) a VGA library for Arduino UNO and MEGA (the first lib)
 - [VGAXUA](https://github.com/smaffer/vgaxua) a VGAX variant that support 192x80px 1bpp or 200x240px 1bpp on Arduino MEGA!
-- [ESPVGAX](https://github.com/smaffer/espvgax) VGA signal generation on ESP8266 with 1 color but higher resolution
+- [ESPVGAX](https://github.com/smaffer/espvgax) VGA signal generation on ESP8266 with 1 color and 512x480px high resolution
 
 
 
